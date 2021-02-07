@@ -1,10 +1,10 @@
-[logo]: https://gitlab.coodoo.io/workhorse/workhorse-ui-api-legacy/-/raw/master/logo.png "Workhorse: Extendable Java Job Engine for background jobs and business critical tasks"
-
-# Workhorse-UI API Lagacy ![alt text][logo]
+# Workhorse-UI API Lagacy
 
 > Lagacy support API for the Workhorse-UI in version 1.5
 
 ## Table of Contents
+<img align="right" height="200px" src="logo.png">
+
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Getting started](#getting-started)
