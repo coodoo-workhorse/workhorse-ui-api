@@ -1,7 +1,6 @@
 package io.coodoo.workhorse.api.dto;
 
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
-import io.coodoo.workhorse.persistence.interfaces.PersistenceTyp;
 
 public class ConfigDTO {
     public String timeZone;
@@ -9,7 +8,6 @@ public class ConfigDTO {
     public int jobQueueMin;
     public int jobQueuePollerInterval; // in seconds
     public int jobQueuePusherPoll; // in seconds
-    public PersistenceTyp persistenceTyp;
 
     public boolean isPusherAvailable;
 
@@ -17,10 +15,9 @@ public class ConfigDTO {
 
     public ConfigDTO(WorkhorseConfig workhorseConfig) {
         timeZone = workhorseConfig.getTimeZone();
-        jobQueueMax = workhorseConfig.getJobQueueMax();
-        jobQueueMin = workhorseConfig.getJobQueueMin();
-        jobQueuePollerInterval = workhorseConfig.getJobQueuePollerInterval();
-        jobQueuePusherPoll = workhorseConfig.getJobQueuePusherPoll();
-        persistenceTyp = workhorseConfig.getPersistenceTyp();
+        jobQueueMax = workhorseConfig.getBufferMax();
+        jobQueueMin = workhorseConfig.getBufferMin();
+        jobQueuePollerInterval = workhorseConfig.getBufferPollInterval();
+        jobQueuePusherPoll = workhorseConfig.getBufferPushFallbackPollInterval();
     }
 }

@@ -8,7 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.coodoo.workhorse.core.control.WorkhorseConfigService;
+import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 /**
@@ -20,25 +20,19 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 public class WorkhorseConfigRessource {
 
     @Inject
-    WorkhorseConfigService workhorseConfigService;
+    WorkhorseService workhorseService;
 
     @GET
     @Path("/")
     public WorkhorseConfig get() {
-        return workhorseConfigService.getWorkhorseConfig();
-
+        return workhorseService.getWorkhorseConfig();
     }
 
     @PUT
     @Path("/")
     public WorkhorseConfig update(WorkhorseConfig jobEngineConfig) {
-
-        return workhorseConfigService.updateWorkhorseConfig(jobEngineConfig);
+        workhorseService.updateWorkhorseConfig(jobEngineConfig);
+        return workhorseService.getWorkhorseConfig();
     }
 
-    @PUT
-    @Path("/persistence")
-    public void changePersistence(WorkhorseConfig jobEngineConfig) {
-        workhorseConfigService.updatePersistenceTyp(jobEngineConfig);
-    }
 }
