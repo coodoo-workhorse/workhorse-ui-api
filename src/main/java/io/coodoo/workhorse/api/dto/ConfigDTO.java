@@ -4,7 +4,7 @@ import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
 public class ConfigDTO {
     public String timeZone;
-    public Long jobQueueMax;
+    public int jobQueueMax;
     public int jobQueueMin;
     public int jobQueuePollerInterval; // in seconds
     public int jobQueuePusherPoll; // in seconds
