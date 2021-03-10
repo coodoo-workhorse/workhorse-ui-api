@@ -2,9 +2,9 @@ package io.coodoo.workhorse.api.dto;
 
 import java.time.LocalDateTime;
 
-import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 
 public class JobExecutionView {
@@ -53,8 +53,7 @@ public class JobExecutionView {
 
     public String failMessage;
 
-    public JobExecutionView() {
-    }
+    public JobExecutionView() {}
 
     public JobExecutionView(Job job, Execution jobExecution) {
         this.id = jobExecution.getId();
@@ -78,7 +77,7 @@ public class JobExecutionView {
         this.parameters = jobExecution.getParameters();
         this.failRetry = jobExecution.getFailRetry();
         this.failRetryExecutionId = jobExecution.getFailRetryExecutionId();
-        this.failMessage = jobExecution.getFailMessage();
+        // this.failMessage = jobExecution.getFailMessage();
     }
 
 }
