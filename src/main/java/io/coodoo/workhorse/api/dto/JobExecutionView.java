@@ -53,31 +53,32 @@ public class JobExecutionView {
 
     public String failMessage;
 
-   public JobExecutionView () {}
+    public JobExecutionView() {
+    }
 
-   public JobExecutionView(Job job, Execution jobExecution) {
-       this.id = jobExecution.getId();
-       this.createdAt = jobExecution.getCreatedAt();
-       this.updatedAt = jobExecution.getUpdatedAt();
-       this.jobId = jobExecution.getJobId();
-       this.jobName = job.getName();
-       this.jobDescription = job.getDescription();
-       this.jobStatus = job.getStatus();
-       this.jobFailRetries = job.getFailRetries();
-       this.jobThreads = job.getThreads();
-       this.status = jobExecution.getStatus();
-       this.startedAt = jobExecution.getStartedAt();
-       this.endedAt = jobExecution.getEndedAt();
-       this.priority = jobExecution.getPriority();
-       this.maturity = jobExecution.getMaturity();
-       this.batchId = jobExecution.getBatchId();
-       this.chainId = jobExecution.getChainId();
-       this.chainPreviousExecutionId = jobExecution.getChainedPreviousExecutionId();
-       this.duration = jobExecution.getDuration();
-       this.parameters = jobExecution.getParameters();
-       this.failRetry = jobExecution.getFailRetry();
-       this.failRetryExecutionId = jobExecution.getFailRetryExecutionId();
-       this.failMessage = jobExecution.getFailMessage();
-   }
-   
+    public JobExecutionView(Job job, Execution jobExecution) {
+        this.id = jobExecution.getId();
+        this.createdAt = jobExecution.getCreatedAt();
+        this.updatedAt = jobExecution.getUpdatedAt();
+        this.jobId = jobExecution.getJobId();
+        this.jobName = job.getName();
+        this.jobDescription = job.getDescription();
+        this.jobStatus = job.getStatus();
+        this.jobFailRetries = job.getFailRetries();
+        this.jobThreads = job.getThreads();
+        this.status = jobExecution.getStatus();
+        this.startedAt = jobExecution.getStartedAt();
+        this.endedAt = jobExecution.getEndedAt();
+        this.priority = jobExecution.isPriority();
+        this.maturity = jobExecution.getPlannedFor();
+        this.batchId = jobExecution.getBatchId();
+        this.chainId = jobExecution.getChainId();
+        this.chainPreviousExecutionId = null;
+        this.duration = jobExecution.getDuration();
+        this.parameters = jobExecution.getParameters();
+        this.failRetry = jobExecution.getFailRetry();
+        this.failRetryExecutionId = jobExecution.getFailRetryExecutionId();
+        this.failMessage = jobExecution.getFailMessage();
+    }
+
 }

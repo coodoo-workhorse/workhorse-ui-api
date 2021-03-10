@@ -53,7 +53,8 @@ public class WorkhorseResource {
     @GET
     @Path("/infos")
     public List<WorkhorseInfo> getJobEngineInfos() {
-        return workhorseService.getAllJobs().stream().map(job -> workhorseService.getWorkhorseInfo(job.getId())).collect(Collectors.toList());
+        return workhorseService.getAllJobs().stream().map(job -> workhorseService.getWorkhorseInfo(job.getId()))
+                .collect(Collectors.toList());
     }
 
     @GET
@@ -92,8 +93,9 @@ public class WorkhorseResource {
     @PUT
     @Path("/jobs/{jobId}")
     public Job updateJob(@PathParam("jobId") Long jobId, Job job) {
-        return workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
-                        job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getDaysUntilCleanUp(), job.isUniqueInQueue());
+        return workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(),
+                job.getSchedule(), job.getStatus(), job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(),
+                job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
     }
 
     @GET
@@ -101,8 +103,10 @@ public class WorkhorseResource {
     public ListingResult<JobCountView> getJobsWithCounts(@BeanParam ListingParameters listingParameters) {
         List<Job> listJobs = workhorseService.getAllJobs();
         ListingResult<Job> jobsListing = new ListingResult<Job>(listJobs, new Metadata(100L, listingParameters));
-        List<JobCountView> results = jobsListing.getResults().stream().map(job -> new JobCountView(job)).collect(Collectors.toList());
-        return new ListingResult<JobCountView>(results, jobsListing.getTerms(), jobsListing.getStats(), jobsListing.getMetadata());
+        List<JobCountView> results = jobsListing.getResults().stream().map(job -> new JobCountView(job))
+                .collect(Collectors.toList());
+        return new ListingResult<JobCountView>(results, jobsListing.getTerms(), jobsListing.getStats(),
+                jobsListing.getMetadata());
     }
 
     @GET
@@ -114,15 +118,18 @@ public class WorkhorseResource {
     @POST
     @Path("/jobs/{jobId}/executions")
     public Execution createJobExecution(@PathParam("jobId") Long jobId, Execution jobExecution) {
-        return workhorseService.createExecution(jobId, jobExecution.getParameters(), jobExecution.getPriority(), jobExecution.getMaturity(),
-                        jobExecution.getBatchId(), jobExecution.getChainId(), jobExecution.getChainedPreviousExecutionId(), false);
+        return workhorseService.createExecution(jobId, jobExecution.getParameters(), jobExecution.isPriority(),
+                jobExecution.getPlannedFor(), jobExecution.getExpiresAt(), jobExecution.getBatchId(),
+                jobExecution.getChainId(), null, false);
     }
 
     @PUT
     @Path("/jobs/{jobId}/executions/{jobExecutionId}")
-    public Execution updateJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId, Execution jobExecution) {
-        return workhorseService.updateExecution(jobId, jobExecutionId, jobExecution.getStatus(), jobExecution.getParameters(), jobExecution.getPriority(),
-                        jobExecution.getMaturity(), jobExecution.getFailRetry());
+    public Execution updateJobExecution(@PathParam("jobId") Long jobId,
+            @PathParam("jobExecutionId") Long jobExecutionId, Execution jobExecution) {
+        return workhorseService.updateExecution(jobId, jobExecutionId, jobExecution.getStatus(),
+                jobExecution.getParameters(), jobExecution.isPriority(), jobExecution.getPlannedFor(),
+                jobExecution.getFailRetry());
     }
 
     @DELETE
@@ -133,7 +140,8 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs/{jobId}/execution-views")
-    public ListingResult<JobExecutionView> getExecutionViews(@PathParam("jobId") Long jobId, @BeanParam ListingParameters listingParameters) {
+    public ListingResult<JobExecutionView> getExecutionViews(@PathParam("jobId") Long jobId,
+            @BeanParam ListingParameters listingParameters) {
 
         if (jobId != null && jobId > 0) {
             listingParameters.addFilterAttributes("jobId", jobId.toString());
@@ -144,10 +152,11 @@ public class WorkhorseResource {
 
         ListingResult<Execution> jobsListing = new ListingResult<>(listJobs, new Metadata(100L, listingParameters));
 
-        List<JobExecutionView> results =
-                        jobsListing.getResults().stream().map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
+        List<JobExecutionView> results = jobsListing.getResults().stream()
+                .map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
 
-        return new ListingResult<JobExecutionView>(results, jobsListing.getTerms(), jobsListing.getStats(), jobsListing.getMetadata());
+        return new ListingResult<JobExecutionView>(results, jobsListing.getTerms(), jobsListing.getStats(),
+                jobsListing.getMetadata());
     }
 
     @GET
@@ -179,11 +188,10 @@ public class WorkhorseResource {
     public GroupInfo getBatchInfo(@PathParam("jobId") Long jobId, @PathParam("batchId") Long batchId) {
 
         List<Execution> batchExecutions = workhorseService.getExecutionBatch(jobId, batchId);
-        List<ExecutionInfo> batchInfo =
-                        batchExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
+        List<ExecutionInfo> batchInfo = batchExecutions.stream()
+                .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
+                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
+                .collect(Collectors.toList());
 
         return new GroupInfo(batchId, batchInfo);
     }
@@ -199,11 +207,10 @@ public class WorkhorseResource {
     public GroupInfo getChainInfo(@PathParam("jobId") Long jobId, @PathParam("chainId") Long chainId) {
 
         List<Execution> chainExecutions = workhorseService.getExecutionChain(jobId, chainId);
-        List<ExecutionInfo> batchInfo =
-                        chainExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
+        List<ExecutionInfo> batchInfo = chainExecutions.stream()
+                .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
+                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
+                .collect(Collectors.toList());
 
         return new GroupInfo(chainId, batchInfo);
     }
@@ -224,8 +231,8 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs/next-scheduled-times")
-    public List<LocalDateTime> getNextScheduledTimes(@QueryParam("schedule") String schedule, @QueryParam("times") Integer times,
-                    @QueryParam("start") String start) {
+    public List<LocalDateTime> getNextScheduledTimes(@QueryParam("schedule") String schedule,
+            @QueryParam("times") Integer times, @QueryParam("start") String start) {
 
         Integer scheduleTimes = times != null ? times : 5;
         LocalDateTime startTime = start != null ? LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME) : null;
@@ -235,7 +242,8 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs/schedule-executions")
-    public List<JobScheduleExecutionTimeDTO> getAllScheduleExecutionTimes(@QueryParam("start") String start, @QueryParam("end") String end) {
+    public List<JobScheduleExecutionTimeDTO> getAllScheduleExecutionTimes(@QueryParam("start") String start,
+            @QueryParam("end") String end) {
 
         LocalDateTime startTime = start != null ? LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME) : null;
         LocalDateTime endTime = end != null ? LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME) : null;
