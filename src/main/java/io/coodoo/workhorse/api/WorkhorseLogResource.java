@@ -13,12 +13,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.coodoo.framework.listing.boundary.ListingParameters;
 import io.coodoo.workhorse.api.dto.LogView;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
-import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 /**
@@ -41,7 +41,12 @@ public class WorkhorseLogResource {
     @Path("/")
     public ListingResult<WorkhorseLog> getLogs(@BeanParam ListingParameters listingParameters) {
 
-        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameters);
+        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 = new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(
+                listingParameters.getPage(), listingParameters.getLimit(), listingParameters.getSortAttribute());
+        listingParameter2.setFilter(listingParameters.getFilter());
+        listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
+
+        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameter2);
         return workhorseLogListing;
     }
 
@@ -49,7 +54,12 @@ public class WorkhorseLogResource {
     @Path("/view")
     public ListingResult<LogView> getLogViews(@BeanParam ListingParameters listingParameters) {
 
-        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameters);
+        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 = new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(
+                listingParameters.getPage(), listingParameters.getLimit(), listingParameters.getSortAttribute());
+        listingParameter2.setFilter(listingParameters.getFilter());
+        listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
+
+        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameter2);
 
         List<LogView> results = new ArrayList<>();
 
