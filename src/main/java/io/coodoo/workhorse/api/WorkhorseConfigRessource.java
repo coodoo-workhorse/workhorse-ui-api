@@ -1,5 +1,8 @@
 package io.coodoo.workhorse.api;
 
+import java.time.ZoneId;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -8,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.coodoo.workhorse.api.dto.TimeZonesDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
@@ -33,6 +37,15 @@ public class WorkhorseConfigRessource {
     public WorkhorseConfig update(WorkhorseConfig jobEngineConfig) {
         workhorseService.updateWorkhorseConfig(jobEngineConfig);
         return workhorseService.getWorkhorseConfig();
+    }
+
+    @GET
+    @Path("/timezones")
+    public TimeZonesDTO getTimeZones() {
+        TimeZonesDTO timeZonesDTO = new TimeZonesDTO();
+        timeZonesDTO.setSystemDefaultTimeZone(ZoneId.systemDefault().getId());
+        timeZonesDTO.setTimeZones(ZoneId.getAvailableZoneIds().stream().sorted().collect(Collectors.toList()));
+        return timeZonesDTO;
     }
 
 }
