@@ -13,14 +13,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.coodoo.framework.listing.boundary.ListingParameters;
-import io.coodoo.framework.listing.boundary.ListingResult;
-import io.coodoo.framework.listing.boundary.Metadata;
 import io.coodoo.workhorse.api.dto.LogView;
 import io.coodoo.workhorse.core.boundary.WorkhorseLogService;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 /**
  * Rest interface for the workhorse logs
@@ -41,25 +40,20 @@ public class WorkhorseLogResource {
     @GET
     @Path("/")
     public ListingResult<WorkhorseLog> getLogs(@BeanParam ListingParameters listingParameters) {
-        int limit = 100;
-        List<WorkhorseLog> listJobs = workhorseLogService.getAllLogs(limit);
 
-        ListingResult<WorkhorseLog> jobsListing = new ListingResult<>(listJobs, new Metadata(Long.valueOf(listJobs.size()), listingParameters));
-        return jobsListing;
+        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameters);
+        return workhorseLogListing;
     }
 
     @GET
     @Path("/view")
     public ListingResult<LogView> getLogViews(@BeanParam ListingParameters listingParameters) {
 
-        int limit = 100;
-        List<WorkhorseLog> listJobs = workhorseLogService.getAllLogs(limit);
-
-        ListingResult<WorkhorseLog> jobEngineLogsListing = new ListingResult<>(listJobs, new Metadata(Long.valueOf(listJobs.size()), listingParameters));
+        ListingResult<WorkhorseLog> workhorseLogListing = workhorseLogService.getWorkhorseLogListing(listingParameters);
 
         List<LogView> results = new ArrayList<>();
 
-        for (WorkhorseLog log : jobEngineLogsListing.getResults()) {
+        for (WorkhorseLog log : workhorseLogListing.getResults()) {
             Job job = null;
             if (log.getJobId() != null) {
                 job = workhorseService.getJobById(log.getJobId());
@@ -68,7 +62,7 @@ public class WorkhorseLogResource {
             results.add(new LogView(log, job));
         }
 
-        return new ListingResult<LogView>(results, jobEngineLogsListing.getTerms(), jobEngineLogsListing.getStats(), jobEngineLogsListing.getMetadata());
+        return new ListingResult<LogView>(results, workhorseLogListing.getMetadata());
     }
 
     @GET

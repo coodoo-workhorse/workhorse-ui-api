@@ -20,9 +20,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.coodoo.framework.listing.boundary.ListingParameters;
-import io.coodoo.framework.listing.boundary.ListingResult;
-import io.coodoo.framework.listing.boundary.Metadata;
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
 import io.coodoo.workhorse.api.dto.GroupInfo;
 import io.coodoo.workhorse.api.dto.JobCountView;
@@ -32,6 +29,8 @@ import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters;
+import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -86,8 +85,8 @@ public class WorkhorseResource {
     @GET
     @Path("/jobs")
     public ListingResult<Job> getJobs(@BeanParam ListingParameters listingParameters) {
-        List<Job> listJobs = workhorseService.getAllJobs();
-        return new ListingResult<Job>(listJobs, new Metadata(100L, listingParameters));
+
+        return workhorseService.getJobListing(listingParameters);
     }
 
     @PUT
@@ -101,12 +100,11 @@ public class WorkhorseResource {
     @GET
     @Path("/jobs-count")
     public ListingResult<JobCountView> getJobsWithCounts(@BeanParam ListingParameters listingParameters) {
-        List<Job> listJobs = workhorseService.getAllJobs();
-        ListingResult<Job> jobsListing = new ListingResult<Job>(listJobs, new Metadata(100L, listingParameters));
+
+        ListingResult<Job> jobsListing = workhorseService.getJobListing(listingParameters);
         List<JobCountView> results = jobsListing.getResults().stream().map(job -> new JobCountView(job))
                 .collect(Collectors.toList());
-        return new ListingResult<JobCountView>(results, jobsListing.getTerms(), jobsListing.getStats(),
-                jobsListing.getMetadata());
+        return new ListingResult<>(results, jobsListing.getMetadata());
     }
 
     @GET
@@ -146,17 +144,15 @@ public class WorkhorseResource {
         if (jobId != null && jobId > 0) {
             listingParameters.addFilterAttributes("jobId", jobId.toString());
         }
-        List<Execution> listJobs = workhorseService.getExecutions(jobId);
 
         Job job = workhorseService.getJobById(jobId);
 
-        ListingResult<Execution> jobsListing = new ListingResult<>(listJobs, new Metadata(100L, listingParameters));
+        ListingResult<Execution> executionListing = workhorseService.getExecutionListing(listingParameters);
 
-        List<JobExecutionView> results = jobsListing.getResults().stream()
+        List<JobExecutionView> results = executionListing.getResults().stream()
                 .map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
 
-        return new ListingResult<JobExecutionView>(results, jobsListing.getTerms(), jobsListing.getStats(),
-                jobsListing.getMetadata());
+        return new ListingResult<>(results, executionListing.getMetadata());
     }
 
     @GET
