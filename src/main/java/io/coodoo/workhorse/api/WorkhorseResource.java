@@ -28,6 +28,7 @@ import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobScheduleExecutionTimeDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Execution;
+import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
@@ -184,9 +185,15 @@ public class WorkhorseResource {
     }
 
     @GET
+    @Path("/jobs/{jobId}/executions/{jobExecutionId}/log")
+    public ExecutionLog getJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
+        return workhorseService.getExecutionLog(jobId, jobExecutionId);
+    }
+
+    @GET
     @Path("/jobs/{jobId}/executions/{jobExecutionId}")
-    public Execution getJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getExecutionById(jobId, jobExecutionId);
+    public ExecutionLog getJobExecutionLog(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
+        return workhorseService.getExecutionLog(jobId, jobExecutionId);
     }
 
     @GET

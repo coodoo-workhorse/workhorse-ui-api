@@ -41,8 +41,9 @@ public class WorkhorseLogResource {
     @Path("/")
     public ListingResult<WorkhorseLog> getLogs(@BeanParam ListingParameters listingParameters) {
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 = new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(
-                listingParameters.getPage(), listingParameters.getLimit(), listingParameters.getSortAttribute());
+        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
+                        new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
+                                        listingParameters.getSortAttribute());
         listingParameter2.setFilter(listingParameters.getFilter());
         listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
 
@@ -54,8 +55,9 @@ public class WorkhorseLogResource {
     @Path("/view")
     public ListingResult<LogView> getLogViews(@BeanParam ListingParameters listingParameters) {
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 = new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(
-                listingParameters.getPage(), listingParameters.getLimit(), listingParameters.getSortAttribute());
+        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
+                        new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
+                                        listingParameters.getSortAttribute());
         listingParameter2.setFilter(listingParameters.getFilter());
         listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
 

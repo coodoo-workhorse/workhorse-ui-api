@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
-
 /**
  * @author coodoo GmbH (coodoo.io)
  */

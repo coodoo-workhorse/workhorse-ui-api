@@ -6,7 +6,6 @@ import java.util.List;
 
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
-
 public class GroupInfo {
 
     private Long id;
@@ -124,9 +123,8 @@ public class GroupInfo {
             }
         }
 
-        duration = Duration.between(startedAt, endedAt).getSeconds() * 1000 ;
+        duration = Duration.between(startedAt, endedAt).getSeconds() * 1000;
 
-       
     }
 
     public Long getId() {
