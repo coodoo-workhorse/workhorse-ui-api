@@ -14,11 +14,9 @@ public class JobExecutionStatusSummariesDTO {
     public Long count;
     public List<JobExecutionStatusSummary> jobExecutionStatusSummaries;
 
-    public JobExecutionStatusSummariesDTO() {
-    }
+    public JobExecutionStatusSummariesDTO() {}
 
-    public JobExecutionStatusSummariesDTO(ExecutionStatus status, Long count,
-            List<JobExecutionStatusSummary> jobExecutionStatusSummaries) {
+    public JobExecutionStatusSummariesDTO(ExecutionStatus status, Long count, List<JobExecutionStatusSummary> jobExecutionStatusSummaries) {
         this.status = status;
         this.count = count;
         this.jobExecutionStatusSummaries = jobExecutionStatusSummaries;

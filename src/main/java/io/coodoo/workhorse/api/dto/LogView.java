@@ -1,5 +1,7 @@
 package io.coodoo.workhorse.api.dto;
 
+import java.time.LocalDateTime;
+
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
@@ -59,6 +61,10 @@ public class LogView {
      */
     public boolean stacktrace;
 
+    public LocalDateTime createdAt;
+
+    public LocalDateTime updatedAt;
+
     public LogView() {}
 
     public LogView(WorkhorseLog workhorseLog, Job job) {
@@ -71,6 +77,8 @@ public class LogView {
             this.jobThreads = job.getThreads();
         }
 
+        this.createdAt = workhorseLog.getCreatedAt();
+        this.updatedAt = workhorseLog.getUpdatedAt();
         this.message = workhorseLog.getMessage();
         this.jobId = workhorseLog.getJobId();
         this.byUser = workhorseLog.isByUser();
