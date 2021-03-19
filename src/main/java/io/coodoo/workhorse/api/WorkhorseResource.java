@@ -24,14 +24,18 @@ import io.coodoo.framework.listing.boundary.ListingParameters;
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
 import io.coodoo.workhorse.api.dto.GroupInfo;
 import io.coodoo.workhorse.api.dto.JobCountView;
+import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobScheduleExecutionTimeDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
+import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -99,6 +103,28 @@ public class WorkhorseResource {
     public Job updateJob(@PathParam("jobId") Long jobId, Job job) {
         return workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
                         job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
+    }
+
+    @GET
+    @Path("/monitoring/job-execution-summary/{status}")
+    public JobExecutionStatusSummariesDTO getJobExecutionStatusSummaries(@PathParam("status") ExecutionStatus status,
+                    @QueryParam("last-minutes") Integer lastMinutes) {
+
+        LocalDateTime since = null;
+        Long count = 0L;
+
+        if (lastMinutes != null) {
+
+            since = WorkhorseUtil.timestamp().minusMinutes(lastMinutes);
+        }
+
+        List<JobExecutionStatusSummary> jobExecutionStatusSummaryies = workhorseService.getJobExecutionStatusSummaries(status, since);
+
+        for (JobExecutionStatusSummary jobExecutionStatusSummary : jobExecutionStatusSummaryies) {
+            count = count + jobExecutionStatusSummary.getCount();
+        }
+
+        return new JobExecutionStatusSummariesDTO(status, count, jobExecutionStatusSummaryies);
     }
 
     @GET
