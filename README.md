@@ -1,6 +1,6 @@
-# Workhorse-UI API Lagacy
+# Workhorse-UI API
 
-> Lagacy support API for the Workhorse-UI in version 1.5
+> REST-API for the Workhorse-UI
 
 ## Table of Contents
 <img align="right" height="200px" src="logo.png">
@@ -42,7 +42,7 @@ Please create a [gitLab token](https://gitlab.coodoo.io/profile/personal_access_
 Run command :
 
 ```
-mvn dependency:get -Dartifact=io.coodoo:workhorse:2.0.0-RC1-SNAPSHOT
+mvn dependency:get -Dartifact=io.coodoo:workhorse:2.0.0-RC2-SNAPSHOT
 ```
 
 ## Install
@@ -53,7 +53,7 @@ Create the WAR file
 mvn clean package
 ```
 
-It will appear in `/workhorse-ui-api-legacy/target/workhorse-ui-api-legacy.war`
+It will appear in `/workhorse-ui-api/target/workhorse-ui-api.war`
 
 
 ## Getting started
