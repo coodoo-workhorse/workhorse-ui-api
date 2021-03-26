@@ -176,6 +176,10 @@ public class WorkhorseResource {
             listingParameters.addFilterAttributes("jobId", jobId.toString());
         }
 
+        if (listingParameters.getSortAttribute() == null || listingParameters.getSortAttribute().isEmpty()) {
+            listingParameters.setSortAttribute("-createdAt");
+        }
+
         Job job = workhorseService.getJobById(jobId);
 
         io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
