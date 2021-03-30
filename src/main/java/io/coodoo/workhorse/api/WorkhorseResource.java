@@ -152,7 +152,7 @@ public class WorkhorseResource {
     @Path("/jobs/{jobId}/executions")
     public Execution createJobExecution(@PathParam("jobId") Long jobId, Execution jobExecution) {
         return workhorseService.createExecution(jobId, jobExecution.getParameters(), jobExecution.isPriority(), jobExecution.getPlannedFor(),
-                        jobExecution.getExpiresAt(), jobExecution.getBatchId(), jobExecution.getChainId(), null, false);
+                        jobExecution.getExpiresAt(), jobExecution.getBatchId(), jobExecution.getChainId(), false);
     }
 
     @PUT
