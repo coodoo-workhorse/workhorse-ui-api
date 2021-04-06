@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.coodoo.workhorse.api.dto.TimeZonesDTO;
+import io.coodoo.workhorse.api.dto.UpdateWorkhorseConfigDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
 
@@ -34,8 +35,11 @@ public class WorkhorseConfigRessource {
 
     @PUT
     @Path("/")
-    public WorkhorseConfig update(WorkhorseConfig jobEngineConfig) {
-        workhorseService.updateWorkhorseConfig(jobEngineConfig);
+    public WorkhorseConfig update(UpdateWorkhorseConfigDTO config) {
+        workhorseService.updateWorkhorseConfig(config.timeZone, config.bufferMax, config.bufferMin, config.bufferPollInterval,
+                        config.bufferPushFallbackPollInterval, config.minutesUntilCleanup, config.executionTimeout, config.executionTimeoutStatus,
+                        config.logChange, config.logTimeFormat, config.logInfoMarker, config.logWarnMarker, config.logErrorMarker);
+
         return workhorseService.getWorkhorseConfig();
     }
 
