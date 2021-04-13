@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -28,7 +30,9 @@ import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobScheduleExecutionTimeDTO;
+import io.coodoo.workhorse.api.dto.JobThreadDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
+import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
@@ -335,6 +339,21 @@ public class WorkhorseResource {
         }
 
         return jobExecutionCountDTO;
+    }
+
+    @GET
+    @Path("/monitoring/job-threads")
+    public List<JobThreadDTO> getJobThreads() {
+
+        List<JobThreadDTO> jobThreads = new ArrayList<>();
+        Map<Long, Set<JobThread>> jobThreadsMap = workhorseService.getJobThreads();
+
+        for (Set<JobThread> setOfJobThread : jobThreadsMap.values()) {
+            for (JobThread jobThread : setOfJobThread) {
+                jobThreads.add(new JobThreadDTO(jobThread));
+            }
+        }
+        return jobThreads;
     }
 
     // --------------------------------------------------------------------------------------------------------------
