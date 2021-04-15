@@ -111,6 +111,12 @@ public class WorkhorseResource {
                         job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
     }
 
+    @DELETE
+    @Path("/jobs/{jobId}")
+    public void deleteJob(@PathParam("jobId") Long jobId) {
+        workhorseService.deleteJob(jobId);
+    }
+
     @GET
     @Path("/monitoring/job-execution-summary/{status}")
     public JobExecutionStatusSummariesDTO getJobExecutionStatusSummaries(@PathParam("status") ExecutionStatus status,
