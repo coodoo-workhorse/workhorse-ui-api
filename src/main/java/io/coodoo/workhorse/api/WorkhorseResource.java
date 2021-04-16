@@ -30,6 +30,7 @@ import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobScheduleExecutionTimeDTO;
+import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.JobThreadDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.control.JobThread;
@@ -39,6 +40,7 @@ import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
@@ -323,6 +325,14 @@ public class WorkhorseResource {
             }
         }
         return scheduledTimes;
+    }
+
+    @GET
+    @Path("/statistics/job-counts")
+    public JobStatusCountDTO getJobExecutionCount() {
+
+        JobStatusCount jobStatusCount = workhorseService.getJobStatusCount();
+        return new JobStatusCountDTO(jobStatusCount);
     }
 
     @GET

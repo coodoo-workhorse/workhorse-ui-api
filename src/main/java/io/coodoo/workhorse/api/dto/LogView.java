@@ -7,8 +7,7 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 import io.coodoo.workhorse.core.entity.WorkhorseLog;
 
 /**
- * A LogView defines a single {@link Log} which is joined with job information
- * if it has a relation.
+ * A LogView defines a single {@link Log} which is joined with job information if it has a relation.
  */
 public class LogView {
 
@@ -34,8 +33,7 @@ public class LogView {
     public Integer jobThreads;
 
     /**
-     * <code>true</code> if log was made by an user, <code>false</code> if log was
-     * made by the system
+     * <code>true</code> if log was made by an user, <code>false</code> if log was made by the system
      */
     public boolean byUser = false;
 
@@ -68,8 +66,7 @@ public class LogView {
 
     public LocalDateTime updatedAt;
 
-    public LogView() {
-    }
+    public LogView() {}
 
     public LogView(WorkhorseLog workhorseLog, Job job) {
 
