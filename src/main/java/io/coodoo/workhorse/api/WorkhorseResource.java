@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import io.coodoo.framework.listing.boundary.ListingParameters;
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
@@ -218,8 +219,14 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs/{jobId}")
-    public Job getJob(@PathParam("jobId") Long jobId) {
-        return workhorseService.getJobById(jobId);
+    public Response getJob(@PathParam("jobId") Long jobId) {
+
+        Job job = workhorseService.getJobById(jobId);
+
+        if (job == null) {
+            return Response.status(Status.BAD_REQUEST).entity("Job does not exist.").build();
+        }
+        return Response.ok(job).build();
     }
 
     @GET
