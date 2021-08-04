@@ -379,6 +379,14 @@ public class WorkhorseResource {
         return jobThreads;
     }
 
+    @GET
+    @Path("/monitoring/job/{jobId}/buffer-status")
+    public JobBufferStatus getJobBufferStatus(@PathParam("jobId") Long jobId) {
+
+        Job job = workhorseService.getJobById(jobId);
+        return workhorseService.getJobBufferStatus(job);
+    }
+
     // --------------------------------------------------------------------------------------------------------------
     // Deprecated
     // --------------------------------------------------------------------------------------------------------------
