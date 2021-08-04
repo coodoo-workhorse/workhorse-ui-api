@@ -39,6 +39,7 @@ import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
@@ -377,6 +378,14 @@ public class WorkhorseResource {
             }
         }
         return jobThreads;
+    }
+
+    @GET
+    @Path("/monitoring/job/{jobId}/buffer-status")
+    public JobBufferStatus getJobBufferStatus(@PathParam("jobId") Long jobId) {
+
+        Job job = workhorseService.getJobById(jobId);
+        return workhorseService.getJobBufferStatus(job);
     }
 
     // --------------------------------------------------------------------------------------------------------------
