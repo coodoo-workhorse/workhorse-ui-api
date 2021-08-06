@@ -53,6 +53,8 @@ public class JobExecutionView {
 
     public String failMessage;
 
+    public String summary;
+
     public JobExecutionView() {}
 
     public JobExecutionView(Job job, Execution jobExecution) {
@@ -77,7 +79,7 @@ public class JobExecutionView {
         this.parameters = jobExecution.getParameters();
         this.failRetry = jobExecution.getFailRetry();
         this.failRetryExecutionId = jobExecution.getFailRetryExecutionId();
-        // this.failMessage = jobExecution.getFailMessage();
+        this.summary = jobExecution.getSummary();
     }
 
 }
