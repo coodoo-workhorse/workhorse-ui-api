@@ -13,8 +13,10 @@ import javax.ws.rs.core.MediaType;
 
 import io.coodoo.workhorse.api.dto.TimeZonesDTO;
 import io.coodoo.workhorse.api.dto.UpdateWorkhorseConfigDTO;
+import io.coodoo.workhorse.api.dto.WorkhorseConfigDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.WorkhorseConfig;
+import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -29,8 +31,8 @@ public class WorkhorseConfigRessource {
 
     @GET
     @Path("/")
-    public WorkhorseConfig get() {
-        return workhorseService.getWorkhorseConfig();
+    public WorkhorseConfigDTO get() {
+        return new WorkhorseConfigDTO(workhorseService.getWorkhorseConfig(), WorkhorseUtil.getVersion());
     }
 
     @PUT
