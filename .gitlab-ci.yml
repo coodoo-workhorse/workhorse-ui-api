@@ -55,6 +55,8 @@ deploy:
     - apk update && apk add gnupg
     - echo "Import the GPG key"
     - echo  "$workhorse_gpg" | base64 -d > private.key
+    - ls -la ./
+    - cat private.key
     - gpg --version
     - export PASSPHRASE=$(echo "$workhorse_passphrase" | base64 -d)
     - export OSS_PASSWORD=$(echo "$oss_password" | base64 -d)
