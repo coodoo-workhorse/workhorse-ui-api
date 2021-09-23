@@ -10,49 +10,27 @@ import io.coodoo.workhorse.core.entity.JobStatus;
 public class JobExecutionView {
 
     public Long id;
-
     public LocalDateTime createdAt;
-
     public LocalDateTime updatedAt;
-
     public Long jobId;
-
     public String jobName;
-
     public String jobDescription;
-
     public JobStatus jobStatus;
-
     public int jobFailRetries;
-
     public int jobThreads;
-
     public ExecutionStatus status;
-
     public LocalDateTime startedAt;
-
     public LocalDateTime endedAt;
-
     public boolean priority;
-
     public LocalDateTime maturity;
-
     public Long batchId;
-
     public Long chainId;
-
     public Long chainPreviousExecutionId;
-
     public Long duration;
-
     public String parameters;
-
     public int failRetry;
-
     public Long failRetryExecutionId;
-
     public String failMessage;
-
     public String summary;
 
     public JobExecutionView() {}

@@ -27,6 +27,7 @@ import io.coodoo.framework.listing.boundary.ListingParameters;
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
 import io.coodoo.workhorse.api.dto.GroupInfo;
 import io.coodoo.workhorse.api.dto.JobCountView;
+import io.coodoo.workhorse.api.dto.JobDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
@@ -46,6 +47,7 @@ import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
+import it.burning.cron.CronExpressionDescriptor;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -57,6 +59,24 @@ public class WorkhorseResource {
 
     @Inject
     WorkhorseService workhorseService;
+
+    @GET
+    @Path("/schedule-description/{schedule}")
+    public Response scheduleDescription(@PathParam("schedule") String schedule) {
+        return Response.ok(cronExpressionDescriptorMessage(schedule)).build();
+    }
+
+    public static String cronExpressionDescriptorMessage(String schedule) {
+
+        if (schedule != null && !schedule.isEmpty()) {
+            try {
+                return CronExpressionDescriptor.getDescription(schedule);
+            } catch (Exception e) {
+                return WorkhorseUtil.getMessagesFromException(e);
+            }
+        }
+        return null;
+    }
 
     @GET
     @Path("scheduled-job/{jobId}/stop")
@@ -98,21 +118,25 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs")
-    public ListingResult<Job> getJobs(@BeanParam ListingParameters listingParameters) {
+    public ListingResult<JobDTO> getJobs(@BeanParam ListingParameters listingParameters) {
 
         io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
                         new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
                                         listingParameters.getSortAttribute());
         listingParameter2.setFilter(listingParameters.getFilter());
         listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
-        return (ListingResult<Job>) workhorseService.getJobListing(listingParameter2);
+
+        ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameter2);
+        List<JobDTO> dtos = listingResult.getResults().stream().map(JobDTO::new).collect(Collectors.toList());
+        return new ListingResult<JobDTO>(dtos, listingResult.getMetadata());
     }
 
     @PUT
     @Path("/jobs/{jobId}")
-    public Job updateJob(@PathParam("jobId") Long jobId, Job job) {
-        return workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
+    public JobDTO updateJob(@PathParam("jobId") Long jobId, Job job) {
+        Job updatedJob = workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
                         job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
+        return new JobDTO(updatedJob);
     }
 
     @DELETE
@@ -227,7 +251,7 @@ public class WorkhorseResource {
         if (job == null) {
             return Response.status(Status.BAD_REQUEST).entity("Job does not exist.").build();
         }
-        return Response.ok(job).build();
+        return Response.ok(new JobDTO(job)).build();
     }
 
     @GET
@@ -296,10 +320,10 @@ public class WorkhorseResource {
 
     @POST
     @Path("/jobs/{jobId}/scheduled-job-execution")
-    public Job scheduledJobExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
+    public JobDTO scheduledJobExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
 
         workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
-        return job;
+        return new JobDTO(job);
     }
 
     @GET
@@ -327,6 +351,7 @@ public class WorkhorseResource {
                 dto.jobId = job.getId();
                 dto.jobName = job.getName();
                 dto.schedule = job.getSchedule();
+                dto.scheduleDescription = cronExpressionDescriptorMessage(job.getSchedule());
                 dto.executions = workhorseService.getScheduledTimes(job.getSchedule(), startTime, endTime);
                 scheduledTimes.add(dto);
             } catch (RuntimeException e) {
