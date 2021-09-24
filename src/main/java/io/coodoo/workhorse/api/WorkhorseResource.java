@@ -61,8 +61,8 @@ public class WorkhorseResource {
     WorkhorseService workhorseService;
 
     @GET
-    @Path("/schedule-description/{schedule}")
-    public Response scheduleDescription(@PathParam("schedule") String schedule) {
+    @Path("/schedule-description")
+    public Response scheduleDescription(@QueryParam("schedule") String schedule) {
         return Response.ok(cronExpressionDescriptorMessage(schedule)).build();
     }
 
