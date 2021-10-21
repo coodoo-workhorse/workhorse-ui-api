@@ -5,60 +5,25 @@
 ## Table of Contents
 <img align="right" height="200px" src="logo.png">
 
-- [Prerequisites](#prerequisites)
-- [Get Workhorse](#get-workhorse)
+
 - [Install](#install)
-- [Getting started](#getting-started)
 - [Maintainers](#maintainers)
 - [Changelog](#changelog)
 - [Contribute](#contribute)
 - [License](#license)
   
 
-## Prerequisites
-
-Before you begin, ensure you have met the following requirements:
-* You have installed at least [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* You have [Maven](https://maven.apache.org/download.cgi) running on your system
-  
-## Get Workhorse
-  
-Please create a [gitLab token](https://gitlab.coodoo.io/profile/personal_access_tokens) and store it in the settings.xml of your local maven repository as follows:
-
-```
-<server>
-	<id>gitlab-maven</id>
-		<configuration>
-			<httpHeaders>
-				<property>
-					<name>Private-Token</name>
-					<value>ENTER_YOUR_PRIVATE_TOKEN_HERE</value>
-				</property>
-		</httpHeaders>
-	</configuration>
-</server>
-```
-
-Run command :
-
-```
-mvn dependency:get -Dartifact=io.coodoo:workhorse:2.0.0-RC2-SNAPSHOT
-```
-
 ## Install
 
-Create the WAR file
-
-```
-mvn clean package
-```
-
-It will appear in `/workhorse-ui-api/target/workhorse-ui-api.war`
-
-
-## Getting started
-
-Drop the WAR into your autodeploy folder `/wildfly/standalone/deployments/`
+1. Add the following dependency to your project ([published on Maven Central](https://search.maven.org/artifact/io.coodoo/workhorse-ui-api/))
+   
+   ```xml
+   <dependency>
+       <groupId>io.coodoo</groupId>
+       <artifactId>workhorse-ui-api</artifactId>
+       <version>2.0.0-RC4-SNAPSHOT</version>
+   </dependency>
+   ```
 
 
 ## Changelog
