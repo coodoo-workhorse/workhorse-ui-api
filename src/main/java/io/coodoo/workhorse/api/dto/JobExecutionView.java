@@ -30,7 +30,6 @@ public class JobExecutionView {
     public String parameters;
     public int failRetry;
     public Long failRetryExecutionId;
-    public String failMessage;
     public String summary;
 
     public JobExecutionView() {}
