@@ -29,6 +29,7 @@ public class JobDTO {
     public String scheduleDescription;
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
+    public boolean asynchronous;
 
     public JobDTO() {}
 
@@ -51,6 +52,7 @@ public class JobDTO {
         this.scheduleDescription = WorkhorseResource.cronExpressionDescriptorMessage(job.getSchedule());
         this.createdAt = job.getCreatedAt();
         this.updatedAt = job.getUpdatedAt();
+        this.asynchronous = job.isAsynchronous();
     }
 
 }
