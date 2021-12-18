@@ -1,7 +1,6 @@
 package io.coodoo.workhorse.api;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import io.coodoo.workhorse.api.dto.JobDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
-import io.coodoo.workhorse.api.dto.JobScheduleExecutionTimeDTO;
 import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.JobThreadDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
@@ -47,7 +45,6 @@ import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
-import it.burning.cron.CronExpressionDescriptor;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -59,24 +56,6 @@ public class WorkhorseResource {
 
     @Inject
     WorkhorseService workhorseService;
-
-    @GET
-    @Path("/schedule-description")
-    public Response scheduleDescription(@QueryParam("schedule") String schedule) {
-        return Response.ok(cronExpressionDescriptorMessage(schedule)).build();
-    }
-
-    public static String cronExpressionDescriptorMessage(String schedule) {
-
-        if (schedule != null && !schedule.isEmpty()) {
-            try {
-                return CronExpressionDescriptor.getDescription(schedule);
-            } catch (Exception e) {
-                return WorkhorseUtil.getMessagesFromException(e);
-            }
-        }
-        return null;
-    }
 
     @GET
     @Path("scheduled-job/{jobId}/stop")
@@ -324,40 +303,6 @@ public class WorkhorseResource {
 
         workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
         return new JobDTO(job);
-    }
-
-    @GET
-    @Path("/jobs/next-scheduled-times")
-    public List<LocalDateTime> getNextScheduledTimes(@QueryParam("schedule") String schedule, @QueryParam("times") Integer times,
-                    @QueryParam("start") String start) {
-
-        Integer scheduleTimes = times != null ? times : 5;
-        LocalDateTime startTime = start != null ? LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME) : null;
-
-        return workhorseService.getNextScheduledTimes(schedule, scheduleTimes, startTime);
-    }
-
-    @GET
-    @Path("/jobs/schedule-executions")
-    public List<JobScheduleExecutionTimeDTO> getAllScheduleExecutionTimes(@QueryParam("start") String start, @QueryParam("end") String end) {
-
-        LocalDateTime startTime = start != null ? LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME) : null;
-        LocalDateTime endTime = end != null ? LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME) : null;
-
-        List<JobScheduleExecutionTimeDTO> scheduledTimes = new ArrayList<>();
-        for (Job job : workhorseService.getAllScheduledJobs()) {
-            try {
-                JobScheduleExecutionTimeDTO dto = new JobScheduleExecutionTimeDTO();
-                dto.jobId = job.getId();
-                dto.jobName = job.getName();
-                dto.schedule = job.getSchedule();
-                dto.scheduleDescription = cronExpressionDescriptorMessage(job.getSchedule());
-                dto.executions = workhorseService.getScheduledTimes(job.getSchedule(), startTime, endTime);
-                scheduledTimes.add(dto);
-            } catch (RuntimeException e) {
-            }
-        }
-        return scheduledTimes;
     }
 
     @GET

@@ -3,9 +3,9 @@ package io.coodoo.workhorse.api.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import io.coodoo.workhorse.api.WorkhorseResource;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.util.WorkhorseApiUtil;
 
 /**
  * @author coodoo GmbH (coodoo.io)
@@ -48,7 +48,7 @@ public class JobDTO {
         this.minutesUntilCleanUp = job.getMinutesUntilCleanUp();
         this.uniqueQueued = job.isUniqueQueued();
         this.schedule = job.getSchedule();
-        this.scheduleDescription = WorkhorseResource.cronExpressionDescriptorMessage(job.getSchedule());
+        this.scheduleDescription = WorkhorseApiUtil.cronExpressionDescription(job.getSchedule());
         this.createdAt = job.getCreatedAt();
         this.updatedAt = job.getUpdatedAt();
     }
