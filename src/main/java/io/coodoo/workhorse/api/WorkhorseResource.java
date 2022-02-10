@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import io.coodoo.framework.listing.boundary.ListingParameters;
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
 import io.coodoo.workhorse.api.dto.GroupInfo;
 import io.coodoo.workhorse.api.dto.JobCountView;
@@ -32,6 +31,7 @@ import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.JobThreadDTO;
+import io.coodoo.workhorse.api.dto.QueryParamListingParameters;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.entity.Execution;
@@ -97,15 +97,11 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs")
-    public ListingResult<JobDTO> getJobs(@BeanParam ListingParameters listingParameters) {
+    public ListingResult<JobDTO> getJobs(@BeanParam QueryParamListingParameters listingParameters) {
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
-                        new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
-                                        listingParameters.getSortAttribute());
-        listingParameter2.setFilter(listingParameters.getFilter());
-        listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
+        listingParameters.mapQueryParams();
 
-        ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameter2);
+        ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameters);
         List<JobDTO> dtos = listingResult.getResults().stream().map(JobDTO::new).collect(Collectors.toList());
         return new ListingResult<JobDTO>(dtos, listingResult.getMetadata());
     }
@@ -133,30 +129,23 @@ public class WorkhorseResource {
         Long count = 0L;
 
         if (lastMinutes != null) {
-
             since = WorkhorseUtil.timestamp().minusMinutes(lastMinutes);
         }
-
         List<JobExecutionStatusSummary> jobExecutionStatusSummaryies = workhorseService.getJobExecutionStatusSummaries(status, since);
 
         for (JobExecutionStatusSummary jobExecutionStatusSummary : jobExecutionStatusSummaryies) {
             count = count + jobExecutionStatusSummary.getCount();
         }
-
         return new JobExecutionStatusSummariesDTO(status, count, jobExecutionStatusSummaryies);
     }
 
     @GET
     @Path("/jobs-count")
-    public ListingResult<JobCountView> getJobsWithCounts(@BeanParam ListingParameters listingParameters) {
+    public ListingResult<JobCountView> getJobsWithCounts(@BeanParam QueryParamListingParameters listingParameters) {
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
-                        new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
-                                        listingParameters.getSortAttribute());
-        listingParameter2.setFilter(listingParameters.getFilter());
-        listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
+        listingParameters.mapQueryParams();
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingResult<Job> jobsListing = workhorseService.getJobListing(listingParameter2);
+        ListingResult<Job> jobsListing = workhorseService.getJobListing(listingParameters);
         List<JobCountView> results = jobsListing.getResults().stream().map(job -> new JobCountView(job)).collect(Collectors.toList());
         return new ListingResult<>(results, jobsListing.getMetadata());
     }
@@ -195,7 +184,9 @@ public class WorkhorseResource {
 
     @GET
     @Path("/jobs/{jobId}/execution-views")
-    public ListingResult<JobExecutionView> getExecutionViews(@PathParam("jobId") Long jobId, @BeanParam ListingParameters listingParameters) {
+    public ListingResult<JobExecutionView> getExecutionViews(@PathParam("jobId") Long jobId, @BeanParam QueryParamListingParameters listingParameters) {
+
+        listingParameters.mapQueryParams();
 
         if (jobId != null && jobId > 0) {
             listingParameters.addFilterAttributes("jobId", jobId.toString());
@@ -207,13 +198,7 @@ public class WorkhorseResource {
 
         Job job = workhorseService.getJobById(jobId);
 
-        io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters listingParameter2 =
-                        new io.coodoo.workhorse.persistence.interfaces.listing.ListingParameters(listingParameters.getPage(), listingParameters.getLimit(),
-                                        listingParameters.getSortAttribute());
-        listingParameter2.setFilter(listingParameters.getFilter());
-        listingParameter2.setFilterAttributes(listingParameters.getFilterAttributes());
-
-        ListingResult<Execution> executionListing = workhorseService.getExecutionListing(jobId, listingParameter2);
+        ListingResult<Execution> executionListing = workhorseService.getExecutionListing(jobId, listingParameters);
 
         List<JobExecutionView> results =
                         executionListing.getResults().stream().map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
