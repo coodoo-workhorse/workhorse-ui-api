@@ -20,7 +20,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import io.coodoo.workhorse.api.dto.ExecutionInfo;
 import io.coodoo.workhorse.api.dto.GroupInfo;
@@ -93,31 +92,6 @@ public class WorkhorseResource {
     @Path("/is-running")
     public Response isRunning() {
         return Response.ok(workhorseService.isRunning()).build();
-    }
-
-    @GET
-    @Path("/jobs")
-    public ListingResult<JobDTO> getJobs(@BeanParam QueryParamListingParameters listingParameters) {
-
-        listingParameters.mapQueryParams();
-
-        ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameters);
-        List<JobDTO> dtos = listingResult.getResults().stream().map(JobDTO::new).collect(Collectors.toList());
-        return new ListingResult<JobDTO>(dtos, listingResult.getMetadata());
-    }
-
-    @PUT
-    @Path("/jobs/{jobId}")
-    public JobDTO updateJob(@PathParam("jobId") Long jobId, Job job) {
-        Job updatedJob = workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
-                        job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
-        return new JobDTO(updatedJob);
-    }
-
-    @DELETE
-    @Path("/jobs/{jobId}")
-    public void deleteJob(@PathParam("jobId") Long jobId) {
-        workhorseService.deleteJob(jobId);
     }
 
     @GET
@@ -204,18 +178,6 @@ public class WorkhorseResource {
                         executionListing.getResults().stream().map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
 
         return new ListingResult<>(results, executionListing.getMetadata());
-    }
-
-    @GET
-    @Path("/jobs/{jobId}")
-    public Response getJob(@PathParam("jobId") Long jobId) {
-
-        Job job = workhorseService.getJobById(jobId);
-
-        if (job == null) {
-            return Response.status(Status.BAD_REQUEST).entity("Job does not exist.").build();
-        }
-        return Response.ok(new JobDTO(job)).build();
     }
 
     @GET
