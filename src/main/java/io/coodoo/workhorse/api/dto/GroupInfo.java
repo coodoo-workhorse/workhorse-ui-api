@@ -3,7 +3,9 @@ package io.coodoo.workhorse.api.dto;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 
 public class GroupInfo {
@@ -40,7 +42,13 @@ public class GroupInfo {
 
     public GroupInfo() {}
 
-    public GroupInfo(Long id, List<ExecutionInfo> executionInfos) {
+    public GroupInfo(Long id, List<Execution> executions) {
+
+        List<ExecutionInfo> executionInfos =
+                        executions.stream()
+                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
+                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
+                                        .collect(Collectors.toList());
 
         this.id = id;
         size = executionInfos.size();

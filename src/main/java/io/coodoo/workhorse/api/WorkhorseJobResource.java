@@ -25,7 +25,7 @@ import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 /**
  * @author coodoo GmbH (coodoo.io)
  */
-@Path("/workhorse")
+@Path("/workhorse/jobs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class WorkhorseJobResource {
@@ -34,7 +34,8 @@ public class WorkhorseJobResource {
     WorkhorseService workhorseService;
 
     @GET
-    @Path("/jobs")
+    @Path("/")
+    // FIXME: ohne DTO!
     public ListingResult<JobDTO> getJobs(@BeanParam QueryParamListingParameters listingParameters) {
         listingParameters.mapQueryParams();
         ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameters);
@@ -43,7 +44,7 @@ public class WorkhorseJobResource {
     }
 
     @GET
-    @Path("/jobs/{jobId}")
+    @Path("/{jobId}")
     public Response getJob(@PathParam("jobId") Long jobId) {
         Job job = workhorseService.getJobById(jobId);
         if (job == null) {
@@ -53,7 +54,7 @@ public class WorkhorseJobResource {
     }
 
     @PUT
-    @Path("/jobs/{jobId}")
+    @Path("/{jobId}")
     public JobDTO updateJob(@PathParam("jobId") Long jobId, Job job) {
         Job updatedJob = workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
                         job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
@@ -61,7 +62,7 @@ public class WorkhorseJobResource {
     }
 
     @DELETE
-    @Path("/jobs/{jobId}")
+    @Path("/{jobId}")
     public void deleteJob(@PathParam("jobId") Long jobId) {
         workhorseService.deleteJob(jobId);
     }

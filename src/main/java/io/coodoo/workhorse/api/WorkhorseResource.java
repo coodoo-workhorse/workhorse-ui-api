@@ -8,12 +8,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,28 +18,18 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.coodoo.workhorse.api.dto.ExecutionInfo;
-import io.coodoo.workhorse.api.dto.GroupInfo;
-import io.coodoo.workhorse.api.dto.JobCountView;
 import io.coodoo.workhorse.api.dto.JobDTO;
-import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
-import io.coodoo.workhorse.api.dto.JobExecutionView;
 import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.JobThreadDTO;
-import io.coodoo.workhorse.api.dto.QueryParamListingParameters;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.control.JobThread;
-import io.coodoo.workhorse.core.entity.Execution;
-import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobBufferStatus;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
 import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
-import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
 /**
@@ -55,12 +42,6 @@ public class WorkhorseResource {
 
     @Inject
     WorkhorseService workhorseService;
-
-    @GET
-    @Path("scheduled-job/{jobId}/stop")
-    public void stopScheduledJob(@PathParam("jobId") Long jobId) {
-        workhorseService.stopScheduledJob(jobId);
-    }
 
     @GET
     @Path("/infos")
@@ -114,73 +95,6 @@ public class WorkhorseResource {
     }
 
     @GET
-    @Path("/jobs-count")
-    public ListingResult<JobCountView> getJobsWithCounts(@BeanParam QueryParamListingParameters listingParameters) {
-
-        listingParameters.mapQueryParams();
-
-        ListingResult<Job> jobsListing = workhorseService.getJobListing(listingParameters);
-        List<JobCountView> results = jobsListing.getResults().stream().map(job -> new JobCountView(job)).collect(Collectors.toList());
-        return new ListingResult<>(results, jobsListing.getMetadata());
-    }
-
-    @GET
-    @Path("/executions/{jobExecutionId}")
-    public Execution getJobExecution(@PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getExecutionById(null, jobExecutionId);
-    }
-
-    @POST
-    @Path("/jobs/{jobId}/executions")
-    public Execution createJobExecution(@PathParam("jobId") Long jobId, Execution jobExecution) {
-        return workhorseService.createExecution(jobId, jobExecution.getParameters(), jobExecution.isPriority(), jobExecution.getPlannedFor(),
-                        jobExecution.getExpiresAt(), jobExecution.getBatchId(), jobExecution.getChainId());
-    }
-
-    @PUT
-    @Path("/jobs/{jobId}/executions/{jobExecutionId}")
-    public Execution updateJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId, Execution jobExecution) {
-        return workhorseService.updateExecution(jobId, jobExecutionId, jobExecution.getStatus(), jobExecution.getParameters(), jobExecution.isPriority(),
-                        jobExecution.getPlannedFor(), jobExecution.getFailRetry());
-    }
-
-    @DELETE
-    @Path("/jobs/{jobId}/executions/{jobExecutionId}")
-    public void deleteJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        workhorseService.deleteExecution(jobId, jobExecutionId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/executions/{jobExecutionId}/redo")
-    public Execution redoJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.redoJobExecution(jobId, jobExecutionId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/execution-views")
-    public ListingResult<JobExecutionView> getExecutionViews(@PathParam("jobId") Long jobId, @BeanParam QueryParamListingParameters listingParameters) {
-
-        listingParameters.mapQueryParams();
-
-        if (jobId != null && jobId > 0) {
-            listingParameters.addFilterAttributes("jobId", jobId.toString());
-        }
-
-        if (listingParameters.getSortAttribute() == null || listingParameters.getSortAttribute().isEmpty()) {
-            listingParameters.setSortAttribute("-createdAt");
-        }
-
-        Job job = workhorseService.getJobById(jobId);
-
-        ListingResult<Execution> executionListing = workhorseService.getExecutionListing(jobId, listingParameters);
-
-        List<JobExecutionView> results =
-                        executionListing.getResults().stream().map(jobExecution -> new JobExecutionView(job, jobExecution)).collect(Collectors.toList());
-
-        return new ListingResult<>(results, executionListing.getMetadata());
-    }
-
-    @GET
     @Path("/jobs/{jobId}/activate")
     public void activateJob(@PathParam("jobId") Long jobId) {
         workhorseService.activateJob(jobId);
@@ -192,58 +106,7 @@ public class WorkhorseResource {
         workhorseService.deactivateJob(jobId);
     }
 
-    @GET
-    @Path("/jobs/{jobId}/executions/{jobExecutionId}/log")
-    public ExecutionLog getJobExecution(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getExecutionLog(jobId, jobExecutionId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/executions/{jobExecutionId}")
-    public ExecutionLog getJobExecutionLog(@PathParam("jobId") Long jobId, @PathParam("jobExecutionId") Long jobExecutionId) {
-        return workhorseService.getExecutionLog(jobId, jobExecutionId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/batch/{batchId}")
-    public GroupInfo getBatchInfo(@PathParam("jobId") Long jobId, @PathParam("batchId") Long batchId) {
-
-        List<Execution> batchExecutions = workhorseService.getExecutionBatch(jobId, batchId);
-        List<ExecutionInfo> batchInfo =
-                        batchExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
-
-        return new GroupInfo(batchId, batchInfo);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/batch/{batchId}/executions")
-    public List<Execution> getBatchExecutions(@PathParam("jobId") Long jobId, @PathParam("batchId") Long batchId) {
-        return workhorseService.getExecutionBatch(jobId, batchId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/chain/{chainId}")
-    public GroupInfo getChainInfo(@PathParam("jobId") Long jobId, @PathParam("chainId") Long chainId) {
-
-        List<Execution> chainExecutions = workhorseService.getExecutionChain(jobId, chainId);
-        List<ExecutionInfo> batchInfo =
-                        chainExecutions.stream()
-                                        .map(execution -> new ExecutionInfo(execution.getId(), execution.getStatus(), execution.getStartedAt(),
-                                                        execution.getEndedAt(), execution.getDuration(), execution.getFailRetryExecutionId()))
-                                        .collect(Collectors.toList());
-
-        return new GroupInfo(chainId, batchInfo);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/chain/{chainId}/executions")
-    public List<Execution> getChainJobExecutions(@PathParam("jobId") Long jobId, @PathParam("chainId") Long chainId) {
-        return workhorseService.getExecutionChain(jobId, chainId);
-    }
-
+    // FIXME: job resource
     @POST
     @Path("/jobs/{jobId}/scheduled-job-execution")
     public JobDTO scheduledJobExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
@@ -252,34 +115,13 @@ public class WorkhorseResource {
         return new JobDTO(job);
     }
 
+    // FIXME: job resource
     @GET
     @Path("/statistics/job-counts")
     public JobStatusCountDTO getJobExecutionCount() {
 
         JobStatusCount jobStatusCount = workhorseService.getJobStatusCount();
         return new JobStatusCountDTO(jobStatusCount);
-    }
-
-    @GET
-    @Path("/statistics/execution-counts")
-    public JobExecutionCountDTO getJobExecutionCount(@QueryParam("jobId") Long jobId, @QueryParam("last-minutes") Integer lastMinutes) {
-
-        JobExecutionCountDTO jobExecutionCountDTO = null;
-
-        LocalDateTime from = null;
-        if (lastMinutes != null) {
-            from = WorkhorseUtil.timestamp().minusMinutes(lastMinutes);
-        }
-        JobExecutionCount jobExecutionCount = workhorseService.getJobExecutionCount(jobId, from);
-
-        if (jobExecutionCount != null) {
-
-            jobExecutionCountDTO = new JobExecutionCountDTO(jobExecutionCount.getJobId(), jobExecutionCount.getFrom(), jobExecutionCount.getTo(),
-                            jobExecutionCount.getTotal(), jobExecutionCount.getPlanned(), jobExecutionCount.getQueued(), jobExecutionCount.getRunning(),
-                            jobExecutionCount.getFinished(), jobExecutionCount.getFailed(), jobExecutionCount.getAborted());
-        }
-
-        return jobExecutionCountDTO;
     }
 
     @GET
@@ -297,29 +139,13 @@ public class WorkhorseResource {
         return jobThreads;
     }
 
+    // FIXME: job resource
     @GET
     @Path("/monitoring/job/{jobId}/buffer-status")
     public JobBufferStatus getJobBufferStatus(@PathParam("jobId") Long jobId) {
 
         Job job = workhorseService.getJobById(jobId);
         return workhorseService.getJobBufferStatus(job);
-    }
-
-    // --------------------------------------------------------------------------------------------------------------
-    // Deprecated
-    // --------------------------------------------------------------------------------------------------------------
-
-    @GET
-    @Path("/execution-counts/{minutes}")
-    public Object getJobExecutionCount(@PathParam("minutes") Integer minutes) {
-
-        return null;
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/execution-counts/{minutes}")
-    public Object getJobExecutionCountByJob(@PathParam("jobId") Long jobId, @PathParam("minutes") Integer minutes) {
-        return null;
     }
 
 }
