@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,17 +17,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.coodoo.workhorse.api.dto.JobDTO;
 import io.coodoo.workhorse.api.dto.JobExecutionStatusSummariesDTO;
-import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.JobThreadDTO;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.control.JobThread;
 import io.coodoo.workhorse.core.entity.ExecutionStatus;
-import io.coodoo.workhorse.core.entity.Job;
-import io.coodoo.workhorse.core.entity.JobBufferStatus;
 import io.coodoo.workhorse.core.entity.JobExecutionStatusSummary;
-import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.core.entity.WorkhorseInfo;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
@@ -95,36 +89,6 @@ public class WorkhorseResource {
     }
 
     @GET
-    @Path("/jobs/{jobId}/activate")
-    public void activateJob(@PathParam("jobId") Long jobId) {
-        workhorseService.activateJob(jobId);
-    }
-
-    @GET
-    @Path("/jobs/{jobId}/deactivate")
-    public void deactivateJob(@PathParam("jobId") Long jobId) {
-        workhorseService.deactivateJob(jobId);
-    }
-
-    // FIXME: job resource
-    @POST
-    @Path("/jobs/{jobId}/scheduled-job-execution")
-    public JobDTO scheduledJobExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
-
-        workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
-        return new JobDTO(job);
-    }
-
-    // FIXME: job resource
-    @GET
-    @Path("/statistics/job-counts")
-    public JobStatusCountDTO getJobExecutionCount() {
-
-        JobStatusCount jobStatusCount = workhorseService.getJobStatusCount();
-        return new JobStatusCountDTO(jobStatusCount);
-    }
-
-    @GET
     @Path("/monitoring/job-threads")
     public List<JobThreadDTO> getJobThreads() {
 
@@ -137,15 +101,6 @@ public class WorkhorseResource {
             }
         }
         return jobThreads;
-    }
-
-    // FIXME: job resource
-    @GET
-    @Path("/monitoring/job/{jobId}/buffer-status")
-    public JobBufferStatus getJobBufferStatus(@PathParam("jobId") Long jobId) {
-
-        Job job = workhorseService.getJobById(jobId);
-        return workhorseService.getJobBufferStatus(job);
     }
 
 }

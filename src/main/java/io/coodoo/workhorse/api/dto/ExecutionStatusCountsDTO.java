@@ -2,7 +2,7 @@ package io.coodoo.workhorse.api.dto;
 
 import java.time.LocalDateTime;
 
-public class JobExecutionCountDTO {
+public class ExecutionStatusCountsDTO {
     public Long jobId;
     public LocalDateTime from;
     public LocalDateTime to;
@@ -14,9 +14,9 @@ public class JobExecutionCountDTO {
     public Long failed;
     public Long aborted;
 
-    public JobExecutionCountDTO() {}
+    public ExecutionStatusCountsDTO() {}
 
-    public JobExecutionCountDTO(Long jobId, LocalDateTime from, LocalDateTime to, Long total, Long planned, Long queued, Long running, Long finished,
+    public ExecutionStatusCountsDTO(Long jobId, LocalDateTime from, LocalDateTime to, Long total, Long planned, Long queued, Long running, Long finished,
                     Long failed, Long aborted) {
         this.jobId = jobId;
         this.from = from;

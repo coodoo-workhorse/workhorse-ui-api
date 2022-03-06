@@ -15,12 +15,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.coodoo.workhorse.api.dto.GroupInfo;
-import io.coodoo.workhorse.api.dto.JobExecutionCountDTO;
 import io.coodoo.workhorse.api.dto.QueryParamListingParameters;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
-import io.coodoo.workhorse.core.entity.JobExecutionCount;
+import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
@@ -101,24 +100,12 @@ public class WorkhorseExecutionResource {
 
     @GET
     @Path("/status-counts/{last-minutes}")
-    public JobExecutionCountDTO getStatusCount(@PathParam("jobId") Long jobId, @PathParam("last-minutes") Integer lastMinutes) {
-
-        JobExecutionCountDTO jobExecutionCountDTO = null;
-
+    public ExecutionStatusCounts getStatusCount(@PathParam("jobId") Long jobId, @PathParam("last-minutes") Integer lastMinutes) {
         LocalDateTime from = null;
         if (lastMinutes != null) {
             from = WorkhorseUtil.timestamp().minusMinutes(lastMinutes);
         }
-        JobExecutionCount jobExecutionCount = workhorseService.getJobExecutionCount(jobId, from);
-
-        if (jobExecutionCount != null) {
-
-            jobExecutionCountDTO = new JobExecutionCountDTO(jobExecutionCount.getJobId(), jobExecutionCount.getFrom(), jobExecutionCount.getTo(),
-                            jobExecutionCount.getTotal(), jobExecutionCount.getPlanned(), jobExecutionCount.getQueued(), jobExecutionCount.getRunning(),
-                            jobExecutionCount.getFinished(), jobExecutionCount.getFailed(), jobExecutionCount.getAborted());
-        }
-
-        return jobExecutionCountDTO;
+        return workhorseService.getExecutionStatusCounts(jobId, from);
     }
 
 }

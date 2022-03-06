@@ -8,6 +8,7 @@ import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,9 +18,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import io.coodoo.workhorse.api.dto.JobDTO;
+import io.coodoo.workhorse.api.dto.JobStatusCountDTO;
 import io.coodoo.workhorse.api.dto.QueryParamListingParameters;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Job;
+import io.coodoo.workhorse.core.entity.JobBufferStatus;
+import io.coodoo.workhorse.core.entity.JobStatusCount;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 
 /**
@@ -35,7 +39,6 @@ public class WorkhorseJobResource {
 
     @GET
     @Path("/")
-    // FIXME: ohne DTO!
     public ListingResult<JobDTO> getJobs(@BeanParam QueryParamListingParameters listingParameters) {
         listingParameters.mapQueryParams();
         ListingResult<Job> listingResult = (ListingResult<Job>) workhorseService.getJobListing(listingParameters);
@@ -67,4 +70,39 @@ public class WorkhorseJobResource {
         workhorseService.deleteJob(jobId);
     }
 
+    @GET
+    @Path("/{jobId}/activate")
+    public JobDTO activateJob(@PathParam("jobId") Long jobId) {
+        return new JobDTO(workhorseService.activateJob(jobId));
+    }
+
+    @GET
+    @Path("/{jobId}/deactivate")
+    public JobDTO deactivateJob(@PathParam("jobId") Long jobId) {
+        return new JobDTO(workhorseService.deactivateJob(jobId));
+    }
+
+    @POST
+    @Path("/trigger-schedule")
+    public JobDTO triggerScheduledExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
+
+        workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
+        return new JobDTO(job);
+    }
+
+    @GET
+    @Path("/status-counts")
+    public JobStatusCountDTO getJobExecutionCount() {
+
+        JobStatusCount jobStatusCount = workhorseService.getJobStatusCount();
+        return new JobStatusCountDTO(jobStatusCount);
+    }
+
+    @GET
+    @Path("/{jobId}/buffer-status")
+    public JobBufferStatus getJobBufferStatus(@PathParam("jobId") Long jobId) {
+
+        Job job = workhorseService.getJobById(jobId);
+        return workhorseService.getJobBufferStatus(job);
+    }
 }
