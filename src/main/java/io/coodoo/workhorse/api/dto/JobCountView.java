@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.coodoo.workhorse.api.WorkhorseResource;
 import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.core.entity.JobStatus;
+import io.coodoo.workhorse.util.WorkhorseApiUtil;
 
 public class JobCountView {
 
@@ -43,7 +43,7 @@ public class JobCountView {
         this.workerClassName = job.getWorkerClassName();
         this.parametersClassName = job.getParametersClassName();
         this.schedule = job.getSchedule();
-        this.scheduleDescription = WorkhorseResource.cronExpressionDescriptorMessage(job.getSchedule());
+        this.scheduleDescription = WorkhorseApiUtil.cronExpressionDescription(job.getSchedule());
         this.status = job.getStatus();
         this.threads = job.getThreads();
         this.maxPerMinute = job.getMaxPerMinute();
