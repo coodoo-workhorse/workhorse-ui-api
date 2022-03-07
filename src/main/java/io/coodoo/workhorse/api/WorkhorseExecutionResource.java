@@ -100,7 +100,12 @@ public class WorkhorseExecutionResource {
 
     @GET
     @Path("/status-counts/{last-minutes}")
-    public ExecutionStatusCounts getStatusCount(@PathParam("jobId") Long jobId, @PathParam("last-minutes") Integer lastMinutes) {
+    public ExecutionStatusCounts getStatusCount(@PathParam("jobId") Long pathJobId, @PathParam("last-minutes") Integer lastMinutes) {
+
+        Long jobId = null;
+        if (pathJobId != null && pathJobId >= 0) {
+            jobId = pathJobId;
+        }
         LocalDateTime from = null;
         if (lastMinutes != null) {
             from = WorkhorseUtil.timestamp().minusMinutes(lastMinutes);

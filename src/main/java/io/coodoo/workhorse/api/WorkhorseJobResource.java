@@ -83,7 +83,7 @@ public class WorkhorseJobResource {
     }
 
     @POST
-    @Path("/trigger-schedule")
+    @Path("/{jobId}/trigger-schedule")
     public JobDTO triggerScheduledExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
 
         workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
