@@ -58,7 +58,7 @@ public class WorkhorseJobResource {
 
     @PUT
     @Path("/{jobId}")
-    public JobDTO updateJob(@PathParam("jobId") Long jobId, Job job) {
+    public JobDTO updateJob(@PathParam("jobId") Long jobId, JobDTO job) {
         Job updatedJob = workhorseService.updateJob(jobId, job.getName(), job.getDescription(), job.getWorkerClassName(), job.getSchedule(), job.getStatus(),
                         job.getThreads(), job.getMaxPerMinute(), job.getFailRetries(), job.getRetryDelay(), job.getMinutesUntilCleanUp(), job.isUniqueQueued());
         return new JobDTO(updatedJob);
@@ -84,7 +84,7 @@ public class WorkhorseJobResource {
 
     @POST
     @Path("/{jobId}/trigger-schedule")
-    public JobDTO triggerScheduledExecutionCreation(@PathParam("jobId") Long jobId, Job job) throws Exception {
+    public JobDTO triggerScheduledExecutionCreation(@PathParam("jobId") Long jobId, JobDTO job) throws Exception {
 
         workhorseService.triggerScheduledExecutionCreation(workhorseService.getJobById(jobId));
         return new JobDTO(job);

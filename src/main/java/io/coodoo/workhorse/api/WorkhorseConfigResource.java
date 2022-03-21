@@ -24,7 +24,7 @@ import io.coodoo.workhorse.util.WorkhorseUtil;
 @Path("/workhorse/config")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class WorkhorseConfigRessource {
+public class WorkhorseConfigResource {
 
     @Inject
     WorkhorseService workhorseService;
