@@ -1,6 +1,7 @@
 package io.coodoo.workhorse.api;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.ws.rs.BeanParam;
@@ -14,12 +15,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.jeasy.random.EasyRandom;
+import org.jeasy.random.EasyRandomParameters;
+
 import io.coodoo.workhorse.api.dto.GroupInfo;
 import io.coodoo.workhorse.api.dto.QueryParamListingParameters;
 import io.coodoo.workhorse.core.boundary.WorkhorseService;
 import io.coodoo.workhorse.core.entity.Execution;
 import io.coodoo.workhorse.core.entity.ExecutionLog;
 import io.coodoo.workhorse.core.entity.ExecutionStatusCounts;
+import io.coodoo.workhorse.core.entity.Job;
 import io.coodoo.workhorse.persistence.interfaces.listing.ListingResult;
 import io.coodoo.workhorse.util.WorkhorseUtil;
 
@@ -113,4 +118,65 @@ public class WorkhorseExecutionResource {
         return workhorseService.getExecutionStatusCounts(jobId, from);
     }
 
+    @GET
+    @Path("/random-parameters")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getRandomParameters(@PathParam("jobId") Long jobId) {
+
+        try {
+            Job job = workhorseService.getJobById(jobId);
+            if (job == null) {
+                return null;
+            }
+            String parametersClassName = job.getParametersClassName();
+            if (parametersClassName == null) {
+                return null;
+            }
+            Class<?> parametersClass = Class.forName(parametersClassName);
+
+            EasyRandomParameters parameters = new EasyRandomParameters();
+            parameters.seed(new Random().nextLong());
+            parameters.stringLengthRange(3, 12);
+            parameters.collectionSizeRange(2, 5);
+            parameters.randomizationDepth(5);
+            parameters.ignoreRandomizationErrors(true);
+            parameters.overrideDefaultInitialization(false);
+
+            EasyRandom generator = new EasyRandom(parameters);
+            Object parametersRandom = generator.nextObject(parametersClass);
+
+            return WorkhorseUtil.parametersToJson(parametersRandom);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    @GET
+    @Path("/latest-parameters")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getLatestParameters(@PathParam("jobId") Long jobId) {
+
+        Job job = workhorseService.getJobById(jobId);
+        if (job == null) {
+            return null;
+        }
+        String parametersClassName = job.getParametersClassName();
+        if (parametersClassName == null) {
+            return null;
+        }
+
+        QueryParamListingParameters listingParameters = new QueryParamListingParameters();
+        listingParameters.setLimit(5); // for good measure, could have also gone for "parameters":"NOT NULL" but ja...
+        listingParameters.setSortAttribute("-createdAt");
+        listingParameters.addFilterAttributes("jobId", jobId.toString());
+
+        ListingResult<Execution> listingResult = workhorseService.getExecutionListing(jobId, listingParameters);
+
+        for (Execution execution : listingResult.getResults()) {
+            if (execution.getParameters() != null) {
+                return execution.getParameters();
+            }
+        }
+        return null;
+    }
 }
