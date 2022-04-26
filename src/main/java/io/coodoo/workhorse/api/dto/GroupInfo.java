@@ -18,6 +18,8 @@ public class GroupInfo {
 
     private int queued;
 
+    private int planned;
+
     private int running;
 
     private int finished;
@@ -53,6 +55,7 @@ public class GroupInfo {
         this.id = id;
         size = executionInfos.size();
         queued = 0;
+        planned = 0;
         running = 0;
         finished = 0;
         failed = 0;
@@ -66,6 +69,9 @@ public class GroupInfo {
             switch (execution.getStatus()) {
                 case QUEUED:
                     queued++;
+                    break;
+                case PLANNED:
+                    planned++;
                     break;
                 case RUNNING:
                     if (execution.getStartedAt() != null && (startedAt == null || execution.getStartedAt().isBefore(startedAt))) {
@@ -119,6 +125,8 @@ public class GroupInfo {
             }
             if (queued == size) {
                 status = ExecutionStatus.QUEUED;
+            } else if (planned == size) {
+                status = ExecutionStatus.PLANNED;
             } else if (doneCount == size) {
                 status = ExecutionStatus.FINISHED;
                 if (aborted > 0) {
@@ -131,8 +139,9 @@ public class GroupInfo {
             }
         }
 
-        duration = Duration.between(startedAt, endedAt).getSeconds() * 1000;
-
+        if (startedAt != null && endedAt != null) {
+            duration = Duration.between(startedAt, endedAt).getSeconds() * 1000;
+        }
     }
 
     public Long getId() {
@@ -165,6 +174,14 @@ public class GroupInfo {
 
     public void setQueued(int queued) {
         this.queued = queued;
+    }
+
+    public int getPlanned() {
+        return planned;
+    }
+
+    public void setPlanned(int planned) {
+        this.planned = planned;
     }
 
     public int getRunning() {
